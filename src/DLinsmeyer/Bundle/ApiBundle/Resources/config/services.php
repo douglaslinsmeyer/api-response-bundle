@@ -20,3 +20,8 @@ $container->setDefinition(
         )
     )
 );
+
+$container->setAlias(
+    'api_response_factory',
+    'dlinsmeyer_api.response_factory'
+);
