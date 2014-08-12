@@ -1,7 +1,6 @@
 {
     "name": "dlinsmeyer/api-response-bundle",
     "description": "A Symfony2 bundle for making maintainable API responses easier to build.",
-    "version": "1.0.0",
     "type": "library",
     "keywords": ["symfony2", "api", "api response", "response", "bundle", "symfony api", "symfony response"],
     "license": "MIT",
