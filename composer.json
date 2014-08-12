@@ -30,6 +30,5 @@
     "archive": {
         "exclude": ["/test"]
     },
-    "minimum-stability": "dev",
-    "target-dir": "DLinsmeyer/ApiBundle"
+    "minimum-stability": "dev"
 }
