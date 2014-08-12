@@ -1,0 +1,32 @@
+{
+    "name": "dlinsmeyer/api-response-bundle",
+    "description": "A Symfony2 bundle for making maintainable API responses easier to build.",
+    "version": "1.0.0",
+    "type": "library",
+    "keywords": ["symfony2", "api", "api response", "response", "bundle", "symfony api", "symfony response"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Douglas Linsmeyer",
+            "email": "douglinsmeyer@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "jms/serializer-bundle": "0.13.*@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.4.*@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "DLinsmeyer\\": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "archive": {
+        "exclude": ["/test"]
+    }
+}
