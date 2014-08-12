@@ -7,7 +7,7 @@ Installation
 To install the API bundle with Composer just add the following to your
 `composer.json` file:
 
-```json
+```js
 
 // composer.json
 {
