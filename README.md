@@ -19,13 +19,13 @@ To install the API bundle with Composer just add the following to your
 }
 
 ```
-    
+
 ```bash
 
 $ php composer.phar update
 
 ```
-    
+
 Now, Composer will automatically download all required files, and install them
 for you. All that is left to do is to update your ``AppKernel.php`` file, and
 register the new bundle:
@@ -57,7 +57,7 @@ $bundles = array(
 private $documentRepository;
 
 /**
- * @Inject("dlinsmeyer_api.response_factory")
+ * @Inject("api_response_factory")
  *
  * @var ResponseFactory
  */
@@ -91,5 +91,5 @@ public function searchAction($version, $query, $format)
 
     return $response;
 }
-    
+
 ```
