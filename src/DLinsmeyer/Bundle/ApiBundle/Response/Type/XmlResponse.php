@@ -7,15 +7,13 @@
 
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Type;
 
-use Symfony\Component\HttpFoundation\Response;
-
 /**
  * Class XmlResponse
  *
  * @package DLinsmeyer\Bundle\WebBundle\Response
  * @author Douglas Linsmeyer <douglas.linsmeyer@nerdery.com>
  */
-class XmlResponse extends Response
+class XmlResponse extends AbstractResponse
 {
     public function __construct($content = '', $status = 200, $headers = array())
     {

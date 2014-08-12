@@ -7,6 +7,7 @@
 
 namespace DLinsmeyer\Bundle\ApiBundle\Response;
 
+use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\JsonResponse;
@@ -61,7 +62,7 @@ class ResponseFactory
      * @param string $format
      *
      * @throws UnexpectedValueException
-     * @return Response
+     * @return AbstractResponse|YmlResponse|XmlResponse|JsonResponse
      */
     public function create($success, $code, $message, $data, $version = '1.0', $groups = null, $format = null)
     {

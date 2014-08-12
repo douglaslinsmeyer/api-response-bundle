@@ -7,15 +7,13 @@
 
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Type;
 
-use Symfony\Component\HttpFoundation\Response;
-
 /**
  * Class JsonResponse
  *
  * @package DLinsmeyer\Bundle\WebBundle\Response
  * @author Douglas Linsmeyer <douglas.linsmeyer@nerdery.com>
  */
-class JsonResponse extends Response
+class JsonResponse extends AbstractResponse
 {
     public function __construct($content = '', $status = 200, $headers = array())
     {
