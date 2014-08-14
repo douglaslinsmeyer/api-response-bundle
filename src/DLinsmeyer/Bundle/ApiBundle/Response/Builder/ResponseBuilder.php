@@ -7,6 +7,7 @@
 
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Builder;
 
+use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationException;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\Response;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
@@ -31,7 +32,7 @@ class ResponseBuilder implements ResponseBuilderInterface
      * @const
      * @var string
      */
-    const ERROR_RESPONSE_FORMAT_UNKNOWN = 'Response format "%s" is unrecognized. Expected one of: %s';
+    const INVALID_RESPONSE_FORMAT_CONFIG = 'Specified response type %s is not a supported type. Expected one of %s';
 
     /**
      * the response which we are constructing
@@ -69,16 +70,21 @@ class ResponseBuilder implements ResponseBuilderInterface
     protected $groups;
 
     /**
+     * Used for storing known list of response types
+     *
+     * @var array|AbstractResponse[]
+     */
+    protected $responseTypes;
+
+    /**
      * Constructor
      *
      * @param SerializerInterface $serializerInterface - serializer for building our response
      */
-    public function __construct(SerializerInterface $serializerInterface) {
-        $this->format = "";
-        $this->version = "";
-        $this->groups = "";
-
+    public function __construct(SerializerInterface $serializerInterface)
+    {
         $this->responseModel = new Response();
+        $this->responseTypes = array();
     }
 
     /**
@@ -118,16 +124,6 @@ class ResponseBuilder implements ResponseBuilderInterface
      */
     public function setFormat($format)
     {
-        if (!in_array($format, ResponseType::getOptions())) {
-            throw new \UnexpectedValueException(
-                sprintf(
-                    self::ERROR_RESPONSE_FORMAT_UNKNOWN,
-                    $format,
-                    ResponseType::optionsToString()
-                )
-            );
-        }
-
         $this->format = $format;
     }
 
@@ -175,17 +171,37 @@ class ResponseBuilder implements ResponseBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function addResponseType($typeKeyStr, AbstractResponse $responseType)
+    {
+        $this->responseTypes[$typeKeyStr] = $responseType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildResponse()
     {
         $version = $this->getVersion();
-        $version = !empty($version)
-            ? $version
-            : '1.0';
+        if (empty($version)) {
+            throw new InvalidBuilderConfigurationException('No version specified.');
+        }
+
+        if (empty($this->responseTypes)) {
+            throw new InvalidBuilderConfigurationException('No known response types specified.');
+        }
 
         $format = $this->getFormat();
-        $format = !empty($format)
-            ? $format
-            : ResponseType::JSON;
+
+        if (!array_key_exists($format, $this->responseTypes)) {
+            $responseTypesStr = implode(',', $this->responseTypes);
+            throw new InvalidBuilderConfigurationException(
+                sprintf(
+                    'Specified response type %s is not a supported type. Expected one of %s',
+                    $format,
+                    $responseTypesStr
+                )
+            );
+        }
 
         $groups = $this->getGroups();
 
@@ -204,28 +220,9 @@ class ResponseBuilder implements ResponseBuilderInterface
             $serializationContext
         );
 
-        switch ($format) {
-            case ResponseType::JSON:
-                $response = new JsonResponse($serializedResponseData);
-                break;
-
-            case ResponseType::XML:
-                $response = new XmlResponse($serializedResponseData);
-                break;
-
-            case ResponseType::YML:
-                $response = new YmlResponse($serializedResponseData);
-                break;
-
-            default:
-                throw new \UnexpectedValueException(
-                    sprintf(
-                        self::ERROR_RESPONSE_FORMAT_UNKNOWN,
-                        $format,
-                        ResponseType::optionsToString()
-                    )
-                );
-        }
+        $response = $this->responseTypes[$format]->setContent(
+            $serializedResponseData
+        );
 
         return $response;
     }

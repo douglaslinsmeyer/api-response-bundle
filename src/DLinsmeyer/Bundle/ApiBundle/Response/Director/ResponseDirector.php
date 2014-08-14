@@ -2,30 +2,30 @@
 /**
  * File ResponseDirector.php
  *
- * @author Douglas Linsmeyer <douglas.linsmeyer@nerdery.com>
+ * @package DLinsmeyer\Response\Director
+ * @author  Douglas Linsmeyer <douglas.linsmeyer@nerdery.com>
+ * @author  Daniel Lakes <dlakes@nerdery.com>
  */
 
-namespace DLinsmeyer\Bundle\ApiBundle\Response;
+namespace DLinsmeyer\Bundle\ApiBundle\Response\Director;
 
 use DLinsmeyer\Bundle\ApiBundle\Response\Builder\ResponseBuilderInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
-use DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\JsonResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\Serializer;
-use UnexpectedValueException;
 
 /**
  * Class ResponseDirector
  *
- * @package DLinsmeyer\Response
+ * @package DLinsmeyer\Response\Director
  * @author  Douglas Linsmeyer <douglas.linsmeyer@nerdery.com>
  */
 class ResponseDirector
 {
     /**
+     * The builder used for constructing our response
+     *
      * @var ResponseBuilderInterface
      */
     private $responseBuilder;
@@ -33,11 +33,13 @@ class ResponseDirector
     /**
      * Constructor
      *
-     * @param ResponseBuilderInterface $responseBuilderInterface
+     * @param ResponseBuilderInterface $responseBuilderInterface used to construct response
      */
     public function __construct(ResponseBuilderInterface $responseBuilderInterface)
     {
         $this->responseBuilder = $responseBuilderInterface;
+
+        $this->responseBuilder->setVersion('1.0');
     }
 
     /**
@@ -54,6 +56,7 @@ class ResponseDirector
      * Create a response
      *
      * Uses the {@link $responseBuilder} to create a new response
+     *
      * @return AbstractResponse|YmlResponse|XmlResponse|JsonResponse
      */
     public function createResponse()

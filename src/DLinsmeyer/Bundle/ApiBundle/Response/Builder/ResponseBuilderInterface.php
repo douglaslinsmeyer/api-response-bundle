@@ -26,45 +26,45 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 interface ResponseBuilderInterface
 {
     /**
-     * set the success state for the response
+     * set success
      *
-     * @param bool $success
+     * @param bool $success success state for the response model
      *
      * @return self
      */
     public function setSuccess($success);
 
     /**
-     * set the data for the response
+     * set data
      *
-     * @param mixed $data
+     * @param mixed $data data for the response model
      *
      * @return self
      */
     public function setData($data);
 
     /**
-     * set the message for the response
+     * set message
      *
-     * @param $message
+     * @param string $message message for the response model
      *
      * @return self
      */
     public function setMessage($message);
 
     /**
-     * set the status code for the response
+     * set code
      *
-     * @param int $code
+     * @param int $code the status code for the response model
      *
      * @return self
      */
     public function setCode($code);
 
     /**
-     * set the expected format of the response, see also: {@see ResponseType}
+     * set format
      *
-     * @param string $format
+     * @param string $format the expected format of the response, see also: {@see ResponseType}
      *
      * @return self
      * @throws \UnexpectedValueException - thrown when provided format is not one known
@@ -79,9 +79,9 @@ interface ResponseBuilderInterface
     public function getFormat();
 
     /**
-     * Set the version of the API response to return
+     * set version
      *
-     * @param string $version
+     * @param string $version expected API version for the response
      *
      * @return self
      */
@@ -95,9 +95,9 @@ interface ResponseBuilderInterface
     public function getVersion();
 
     /**
-     * Set the group(s) for which the response should be built
+     * Set groups
      *
-     * @param string $groups
+     * @param string $groups group(s) for which the response should be built
      *
      * @return self
      */
@@ -109,6 +109,16 @@ interface ResponseBuilderInterface
      * @return self
      */
     public function getGroups();
+
+    /**
+     * Adds a response type to list of supported response types
+     *
+     * @param string $typeKeyStr the key by which our response should be referred
+     * @param AbstractResponse $responseType type of response
+     *
+     * @return self
+     */
+    public function addResponseType($typeKeyStr, AbstractResponse $responseType);
     
     /**
      * Build our response based on configured parameters

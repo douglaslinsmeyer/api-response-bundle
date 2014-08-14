@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response ;
 abstract class AbstractResponse extends Response
 {
     /**
+     * holds our modeled response
+     *
      * @var ResponseInterface
      */
     private $responseModel;
@@ -26,11 +28,11 @@ abstract class AbstractResponse extends Response
     /**
      * Set the responseModel
      *
-     * @param mixed $responseModel
+     * @param ResponseInterface $responseModel the model representing our response
      *
      * @return self
      */
-    public function setResponseModel($responseModel)
+    public function setResponseModel(ResponseInterface $responseModel)
     {
         $this->responseModel = $responseModel;
 
