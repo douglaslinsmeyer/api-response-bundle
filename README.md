@@ -59,7 +59,7 @@ private $documentRepository;
 /**
  * @Inject("api_response_factory")
  *
- * @var ResponseFactory
+ * @var ResponseDirector
  */
 private $responseFactory;
 

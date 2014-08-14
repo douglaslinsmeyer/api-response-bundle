@@ -11,17 +11,16 @@ $container->setDefinition(
 );
 
 $container->setDefinition(
-    'dlinsmeyer_api.response_factory',
+    'dlinsmeyer_api.response_director',
     new Definition(
-        'DLinsmeyer\Bundle\ApiBundle\Response\ResponseFactory',
+        'DLinsmeyer\Bundle\ApiBundle\Response\Director\ResponseDirector',
         array(
             new Reference('serializer'),
-            new Reference('dlinsmeyer_api.response'),
         )
     )
 );
 
 $container->setAlias(
-    'api_response_factory',
+    'api_response_director',
     'dlinsmeyer_api.response_factory'
 );
