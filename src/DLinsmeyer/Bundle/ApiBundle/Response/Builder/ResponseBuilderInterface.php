@@ -7,10 +7,13 @@
  
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Builder;
 
+use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationException;
+use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationExceptionInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -25,6 +28,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 interface ResponseBuilderInterface
 {
+    /**
+     * Constructor
+     *
+     * @param ResponseInterface $prototype the prototype model off of which our response should be based
+     * @param SerializerInterface $serializerInterface - serializer for building our response
+     */
+    public function __construct(ResponseInterface $prototype, SerializerInterface $serializerInterface);
+
     /**
      * set success
      *
@@ -124,6 +135,7 @@ interface ResponseBuilderInterface
      * Build our response based on configured parameters
      *
      * @return AbstractResponse|YmlResponse|XmlResponse|JsonResponse
+     * @throws InvalidBuilderConfigurationException thrown if the response is not properly configured
      */
     public function buildResponse();
 }

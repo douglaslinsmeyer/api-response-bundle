@@ -57,11 +57,11 @@ $bundles = array(
 private $documentRepository;
 
 /**
- * @Inject("api_response_factory")
+ * @Inject("api_response_builder")
  *
- * @var ResponseDirector
+ * @var ResponseBuilderInterface
  */
-private $responseFactory;
+private $responseBuilder;
 
 //...
 
@@ -79,15 +79,18 @@ private $responseFactory;
 public function searchAction($version, $query, $format)
 {
     $documents = $this->documentRepository->search($query);
-    $response = $this->responseFactory->create(
-        true,
-        2000,
-        'Search complete.',
-        $documents,
-        $version,
-        null,
-        $format
-    );
+    $this->responseBuilder->setVersion($version)
+                          ->setFormat($format);
+
+    if($someLogicCondition) {
+        $this->responseBuilder->setSuccess(true)
+                              ->setData($myLogicData);
+    } else {
+        $this->responseBuilder->setSuccess(false)
+                              ->setMessage("Logic condition failed");
+    }
+
+    return $this->responseBuilder->buildResponse();
 
     return $response;
 }

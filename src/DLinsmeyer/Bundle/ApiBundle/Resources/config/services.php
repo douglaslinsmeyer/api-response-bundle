@@ -3,9 +3,6 @@
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use \DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
-use \DLinsmeyer\Bundle\ApiBundle\Response\Type\JsonResponse;
-use \DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
-use \DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse;
 
 $container->setDefinition(
     'dlinsmeyer_api.response',
@@ -14,45 +11,69 @@ $container->setDefinition(
     )
 );
 
-$responseBuilderDef = new Definition(
-    'DLinsmeyer\Bundle\ApiBundle\Response\Builder\ResponseBuilder'
+$container->setDefinition(
+    'dlinsmeyer_api.response_type.json',
+    new Definition(
+        'DLinsmeyer\Bundle\ApiBundle\Response\Type\JsonResponse'
+    )
 );
-$responseBuilderDef->addMethodCall(
-    'setResponseType',
-    array(
-        ResponseType::JSON,
-        new JsonResponse(),
+$container->setDefinition(
+    'dlinsmeyer_api.response_type.xml',
+    new Definition(
+        'DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse'
     )
-)->addMethodCall(
-    'setResponseType',
-    array(
-        ResponseType::XML,
-        new XmlResponse(),
-    )
-)->addMethodCall(
-    'setResponseType',
-    array(
-        ResponseType::YML,
-        new YmlResponse(),
+);
+$container->setDefinition(
+    'dlinsmeyer_api.response_type.yml',
+    new Definition(
+        'DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse'
     )
 );
 
+$responseBuilderDef = new Definition(
+    'DLinsmeyer\Bundle\ApiBundle\Response\Builder\ResponseBuilder',
+    array(
+        new Reference('dlinsmeyer_api.response'),
+        new Reference('serializer'),
+    )
+);
+$responseBuilderDef->addMethodCall(
+    'addResponseType',
+    array(
+        ResponseType::JSON,
+        new Reference('response_type_json'),
+    )
+)->addMethodCall(
+    'addResponseType',
+    array(
+        ResponseType::XML,
+        new Reference('response_type_xml'),
+    )
+)->addMethodCall(
+    'addResponseType',
+    array(
+        ResponseType::YML,
+        new Reference('response_type_yml'),
+    )
+);
 $container->setDefinition(
     'dlinsmeyer_api.response_builder',
     $responseBuilderDef
 );
 
-$container->setDefinition(
-    'dlinsmeyer_api.response_director',
-    new Definition(
-        'DLinsmeyer\Bundle\ApiBundle\Response\Director\ResponseDirector',
-        array(
-            new Reference('serializer'),
-        )
-    )
-);
-
 $container->setAlias(
-    'api_response_director',
-    'dlinsmeyer_api.response_factory'
+    'api_response_builder',
+    'dlinsmeyer_api.response_builder'
+);
+$container->setAlias(
+    'response_type_json',
+    'dlinsmeyer_api.response_type.json'
+);
+$container->setAlias(
+    'response_type_xml',
+    'dlinsmeyer_api.response_type.xml'
+);
+$container->setAlias(
+    'response_type_yml',
+    'dlinsmeyer_api.response_type.yml'
 );

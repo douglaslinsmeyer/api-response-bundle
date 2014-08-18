@@ -13,7 +13,7 @@ namespace DLinsmeyer\Bundle\ApiBundle\Exception;
  * @package DLinsmeyer\Bundle\ApiBundle\Exception 
  * @author Daniel Lakes <dlakes@nerdery.com>
  */
-class InvalidBuilderConfigurationException extends \Exception implements InvalidBuilderConfigurationExceptionInterface
+class InvalidBuilderConfigurationException extends \Exception
 {
 
 }

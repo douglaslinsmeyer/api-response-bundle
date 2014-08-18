@@ -8,13 +8,8 @@
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Builder;
 
 use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationException;
-use DLinsmeyer\Bundle\ApiBundle\Response\Model\Response;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
-use DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
-use DLinsmeyer\Bundle\ApiBundle\Response\Type\JsonResponse;
-use DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
-use DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 
@@ -77,13 +72,12 @@ class ResponseBuilder implements ResponseBuilderInterface
     protected $responseTypes;
 
     /**
-     * Constructor
-     *
-     * @param SerializerInterface $serializerInterface - serializer for building our response
+     * {@inheritdoc}
      */
-    public function __construct(SerializerInterface $serializerInterface)
+    public function __construct(ResponseInterface $prototype, SerializerInterface $serializer)
     {
-        $this->responseModel = new Response();
+        $this->responseModel = clone    $prototype;
+        $this->serializer = $serializer;
         $this->responseTypes = array();
     }
 
@@ -93,6 +87,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setSuccess($success)
     {
         $this->responseModel->setSuccess($success);
+
+        return $this;
     }
 
     /**
@@ -101,6 +97,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setData($data)
     {
         $this->responseModel->setData($data);
+
+        return $this;
     }
 
     /**
@@ -109,6 +107,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setMessage($message)
     {
         $this->responseModel->setMessage($message);
+
+        return $this;
     }
 
     /**
@@ -117,6 +117,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setCode($code)
     {
         $this->responseModel->setCode($code);
+
+        return $this;
     }
 
     /**
@@ -125,6 +127,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setFormat($format)
     {
         $this->format = $format;
+
+        return $this;
     }
 
     /**
@@ -142,6 +146,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setVersion($version)
     {
         $this->version = $version;
+
+        return $this;
     }
 
     /**
@@ -158,6 +164,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function setGroups($groups)
     {
         $this->groups = $groups;
+
+        return $this;
     }
 
     /**
@@ -174,6 +182,8 @@ class ResponseBuilder implements ResponseBuilderInterface
     public function addResponseType($typeKeyStr, AbstractResponse $responseType)
     {
         $this->responseTypes[$typeKeyStr] = $responseType;
+
+        return $this;
     }
 
     /**
@@ -196,7 +206,7 @@ class ResponseBuilder implements ResponseBuilderInterface
             $responseTypesStr = implode(',', $this->responseTypes);
             throw new InvalidBuilderConfigurationException(
                 sprintf(
-                    'Specified response type %s is not a supported type. Expected one of %s',
+                    'Specified response type %s is not a supported type. Expected one of: %s',
                     $format,
                     $responseTypesStr
                 )
@@ -205,10 +215,11 @@ class ResponseBuilder implements ResponseBuilderInterface
 
         $groups = $this->getGroups();
 
-        $serializationContext = SerializationContext::create()
-                                                    ->setVersion($version)
-                                                    ->setSerializeNull(true)
-                                                    ->enableMaxDepthChecks();
+        $serializationContext = SerializationContext::create();
+        $serializationContext
+            ->setVersion($version)
+            ->setSerializeNull(true)
+            ->enableMaxDepthChecks();
 
         if (null !== $groups) {
             $serializationContext->setGroups($$groups);
@@ -227,4 +238,3 @@ class ResponseBuilder implements ResponseBuilderInterface
         return $response;
     }
 }
- 
