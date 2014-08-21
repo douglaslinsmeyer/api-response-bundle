@@ -32,4 +32,14 @@ class ResponseType
             self::JSON,
         ];
     }
+
+    /**
+     * Retrieve all response types as a string
+     *
+     * @return string
+     */
+    public static function optionsToString()
+    {
+        return implode(',', self::getOptions());
+    }
 }
