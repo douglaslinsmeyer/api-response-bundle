@@ -72,7 +72,6 @@ private $responseBuilder;
  *
  * @param string $version
  * @param string $query
- * @param string $format e.g. "json"|"xml"|"yml"
  *
  * @return JsonResponse
  */
