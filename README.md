@@ -68,7 +68,7 @@ private $responseBuilder;
 /**
  * Search for documents
  *
- * @Route("/api/v{version}/documents/search/{query}.{format}", name="acme_api_document_search")
+ * @Route("/api/v{version}/documents/search/{query}.{_format}", name="acme_api_document_search")
  *
  * @param string $version
  * @param string $query
@@ -76,11 +76,11 @@ private $responseBuilder;
  *
  * @return JsonResponse
  */
-public function searchAction($version, $query, $format)
+public function searchAction($version, $query)
 {
     $documents = $this->documentRepository->search($query);
     $this->responseBuilder->setVersion($version)
-                          ->setFormat($format);
+                          ->setFormat($this->getRequest()->getRequestFormat());
 
     if($someLogicCondition) {
         $this->responseBuilder->setSuccess(true)
