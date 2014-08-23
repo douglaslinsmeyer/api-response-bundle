@@ -22,14 +22,6 @@ use JMS\Serializer\SerializerInterface;
 class ResponseBuilder implements ResponseBuilderInterface
 {
     /**
-     * Used for notifying user of invalid response format
-     *
-     * @const
-     * @var string
-     */
-    const INVALID_RESPONSE_FORMAT_CONFIG = 'Specified response type %s is not a supported type. Expected one of %s';
-
-    /**
      * the response which we are constructing
      *
      * @var ResponseInterface
