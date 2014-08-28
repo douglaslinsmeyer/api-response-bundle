@@ -26,6 +26,11 @@ interface ResponseInterface
     public function getData();
 
     /**
+     * @return mixed
+     */
+    public function getErrors();
+
+    /**
      * @return string
      */
     public function getMessage();
@@ -48,6 +53,13 @@ interface ResponseInterface
      * @return self
      */
     public function setData($data);
+
+    /**
+     * @param mixed $errors
+     *
+     * @return self
+     */
+    public function setErrors($errors);
 
     /**
      * @param $message

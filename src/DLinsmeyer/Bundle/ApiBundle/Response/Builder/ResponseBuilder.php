@@ -96,6 +96,16 @@ class ResponseBuilder implements ResponseBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setErrors($errors)
+    {
+        $this->responseModel->setErrors($errors);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setMessage($message)
     {
         $this->responseModel->setMessage($message);
