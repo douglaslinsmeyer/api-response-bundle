@@ -55,6 +55,15 @@ interface ResponseBuilderInterface
     public function setData($data);
 
     /**
+     * set errors
+     *
+     * @param mixed $errors errors for the response model
+     *
+     * @return self
+     */
+    public function setErrors($errors);
+    
+    /**
      * set message
      *
      * @param string $message message for the response model

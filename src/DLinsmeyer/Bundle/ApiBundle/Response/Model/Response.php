@@ -52,6 +52,14 @@ class Response implements ResponseInterface
     private $data;
 
     /**
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     *
+     * @var mixed
+     */
+    private $errors;
+
+    /**
      * Set the code
      *
      * @param int $code
@@ -97,6 +105,30 @@ class Response implements ResponseInterface
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * setter for errors
+     *
+     * @param array $errors errors for Response
+     *
+     * @return $this
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    /**
+     * getter for errors
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     /**
