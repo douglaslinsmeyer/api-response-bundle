@@ -85,8 +85,11 @@ public function searchAction($version, $query)
         $this->responseBuilder->setSuccess(true)
                               ->setData($myLogicData);
     } else {
-        $this->responseBuilder->setSuccess(false)
-                              ->setMessage("Logic condition failed");
+        $errors = $this->getErrors();
+        $this->responseBuilder
+            ->setSuccess(false)
+            ->setMessage("Logic condition failed")
+            ->setErrors($errors);
     }
 
     return $this->responseBuilder->buildResponse();
