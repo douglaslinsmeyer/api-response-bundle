@@ -88,15 +88,3 @@ $container->setDefinition(
     'dlinsmeyer_api.serializer.handler.mixed_type',
     $mixedTypeDefinition
 );
-
-$mixedPreSerializeEventDefinition = new Definition(
-    'DLinsmeyer\Bundle\ApiBundle\Serializer\Event\Subscriber\MixedTypePreSerializeSubscriber'
-);
-
-$mixedPreSerializeEventDefinition->addTag(
-    'jms_serializer.event_subscriber'
-);
-$container->setDefinition(
-    'dlinsmeyer_api.serializer.event.subscriber.mixed_type_preSerialize',
-    $mixedPreSerializeEventDefinition
-);
