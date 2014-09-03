@@ -49,6 +49,7 @@ class Response implements ResponseInterface
     /**
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Type("Mixed")
      *
      * @var mixed
      */
@@ -57,6 +58,7 @@ class Response implements ResponseInterface
     /**
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Type("Mixed")
      *
      * @var mixed
      */
