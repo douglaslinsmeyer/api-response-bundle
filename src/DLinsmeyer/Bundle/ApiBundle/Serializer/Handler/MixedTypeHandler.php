@@ -119,7 +119,16 @@ class MixedTypeHandler implements SubscribingHandlerInterface
      */
     public function deserializeMixedTypeFromJson(JsonDeserializationVisitor $visitor, $value, array $type, DeserializationContext $context)
     {
-        $test = true;
+        $declaredType = key($value);
+        $extractedData = current($value);
+        $correctTypeArr = array(
+            'name' => $declaredType,
+            'params' => array(),
+        );
+        /** @var GraphNavigator $navigator */
+        $navigator = $visitor->getNavigator();
+
+        return $navigator->accept($extractedData, $correctTypeArr, $context);
     }
 
     /**
