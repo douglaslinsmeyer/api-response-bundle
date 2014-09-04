@@ -2,25 +2,21 @@
 
 namespace DLinsmeyer\Bundle\ApiBundle\Serializer\Handler;
 
-use JMS\Serializer\Context;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
+use JMS\Serializer\JsonDeserializationVisitor;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\SerializationContext;
 
 /**
- * [Class desc. text goes here...]
+ * A custom serialization type to handle runtime calculation of
+ * type for 'mixed' data fields.
  *
- * @package DLinsmeyer\Bundle\ApiBundle\Serializer\Handler
- * @subpackage
  * @author Daniel Lakes <dlakes@nerdery.com>
  */
 class MixedTypeHandler implements SubscribingHandlerInterface
 {
-    const DETERMINED_TYPE_ARR_KEY = "calculatedType";
-    const VALUE_ARR_KEY = "value";
-
     /**
      * Return format:
      *
@@ -55,10 +51,21 @@ class MixedTypeHandler implements SubscribingHandlerInterface
         );
     }
 
+    /**
+     * Given a $value, determines the *actual* type of the data, serializes, and returns
+     *
+     * @param JsonSerializationVisitor $visitor
+     * @param $value
+     * @param array $type
+     * @param SerializationContext $context
+     *
+     * @return mixed
+     */
     public function serializeMixedTypeToJson(JsonSerializationVisitor $visitor, $value, array $type, SerializationContext $context)
     {
         $isObject = is_object($value);
-        $dataType = $isObject ? get_class($value) : gettype($value);
+
+        $dataType = $this->determineType($value);
 
         $typeArr = array(
             'name' => $dataType,
@@ -96,12 +103,34 @@ class MixedTypeHandler implements SubscribingHandlerInterface
             $context->startVisiting($value);
             return $result;
         } else {
-            return $visitor->getNavigator()->accept($value, $wrapperArr, $context);
+            return $visitor->getNavigator()->accept($wrappedData, $wrapperArr, $context);
         }
     }
 
-    public function deserializeMixedTypeFromJson(JsonSerializationVisitor $visitor, $value, array $type, DeserializationContext $context)
+    /**
+     * Based on the data type stored in the $value array, deserializes data and returns.
+     *
+     * @param JsonDeserializationVisitor $visitor
+     * @param $value - an array of the format: [type => data], where type is the data type for the data, and data is...data
+     * @param array $type
+     * @param DeserializationContext $context
+     *
+     * @return mixed
+     */
+    public function deserializeMixedTypeFromJson(JsonDeserializationVisitor $visitor, $value, array $type, DeserializationContext $context)
     {
         $test = true;
+    }
+
+    /**
+     * Given a $value, determines the type of the data.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function determineType($value)
+    {
+        return is_object($value) ? get_class($value) : gettype($value);
     }
 }
