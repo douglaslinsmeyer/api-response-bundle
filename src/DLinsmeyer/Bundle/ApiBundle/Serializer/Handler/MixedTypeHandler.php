@@ -3,9 +3,11 @@
 namespace DLinsmeyer\Bundle\ApiBundle\Serializer\Handler;
 
 use JMS\Serializer\Context;
+use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\SerializationContext;
 
 /**
  * [Class desc. text goes here...]
@@ -53,21 +55,42 @@ class MixedTypeHandler implements SubscribingHandlerInterface
         );
     }
 
-    public function serializeMixedTypeToJson(JsonSerializationVisitor $visitor, $value, array $type, Context $context)
+    /**
+     * Examines the actual type of $value and serializes based on that type
+     *
+     * @param JsonSerializationVisitor $visitor
+     * @param $value
+     * @param array $type
+     * @param SerializationContext $context
+     *
+     * @return mixed
+     */
+    public function serializeMixedTypeToJson(JsonSerializationVisitor $visitor, $value, array $type, SerializationContext $context)
     {
-        if(is_object($value)) {
-            $calculatedType = get_class($value);
-        } else {
-            $calculatedType = gettype($value);
-        }
+        $isObject = is_object($value);
+        $dataType = $isObject ? get_class($value) : gettype($value);
 
-        return array(
-            self::VALUE_ARR_KEY => $value,
-            self::DETERMINED_TYPE_ARR_KEY => $calculatedType,
+        $typeArr = array(
+            'name' => $dataType,
+            'params' => array()
         );
+
+        if($isObject){
+            /*
+             * this has to be done to ensure the serializer will properly parse this value
+             * See JMS/Serializer/GraphNavigator.php line 143 (if ($context->isVisiting($data)) [...])
+             */
+            $context->stopVisiting($value);
+            $result = $visitor->getNavigator()->accept($value, $typeArr, $context);
+            //now that we're done, reattach so it can handle all of its cleanup
+            $context->startVisiting($value);
+            return $result;
+        } else {
+            return $visitor->getNavigator()->accept($value, $typeArr, $context);
+        }
     }
 
-    public function deserializeMixedTypeFromJson(JsonSerializationVisitor $visitor, $value, array $type, Context $context)
+    public function deserializeMixedTypeFromJson(JsonSerializationVisitor $visitor, $value, array $type, DeserializationContext $context)
     {
         $test = true;
     }
