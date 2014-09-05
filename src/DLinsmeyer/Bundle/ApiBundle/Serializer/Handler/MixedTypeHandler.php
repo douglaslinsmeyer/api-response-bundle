@@ -111,15 +111,15 @@ class MixedTypeHandler implements SubscribingHandlerInterface
      * Based on the data type stored in the $value array, deserializes data and returns.
      *
      * @param JsonDeserializationVisitor $visitor
-     * @param $value - an array of the format: [type => data], where type is the data type for the data, and data is...data
+     * @param array $value - an array of the format: [type => data], where type is the data type for the data, and data is...data
      * @param array $type
      * @param DeserializationContext $context
      *
      * @return mixed
      */
-    public function deserializeMixedTypeFromJson(JsonDeserializationVisitor $visitor, $value, array $type, DeserializationContext $context)
+    public function deserializeMixedTypeFromJson(JsonDeserializationVisitor $visitor, array $value, array $type, DeserializationContext $context)
     {
-        $declaredType = key($value);
+        $declaredType = $this->extractTypeOnDeserialize($value);
         $extractedData = current($value);
         $correctTypeArr = array(
             'name' => $declaredType,
@@ -129,6 +129,18 @@ class MixedTypeHandler implements SubscribingHandlerInterface
         $navigator = $visitor->getNavigator();
 
         return $navigator->accept($extractedData, $correctTypeArr, $context);
+    }
+
+    /**
+     * Extracts our declared type from the provided array on deserialization
+     *
+     * @param array $value
+     *
+     * @return string
+     */
+    protected function extractTypeOnDeserialize(array $value)
+    {
+        return key($value);
     }
 
     /**
