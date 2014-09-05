@@ -4,6 +4,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use \DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
 
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $container->setDefinition(
     'dlinsmeyer_api.response',
     new Definition(
@@ -76,4 +77,14 @@ $container->setAlias(
 $container->setAlias(
     'response_type_yml',
     'dlinsmeyer_api.response_type.yml'
+);
+
+$mixedTypeDefinition = new Definition(
+    'DLinsmeyer\Bundle\ApiBundle\Serializer\Handler\MixedTypeHandler'
+);
+$mixedTypeDefinition->addTag('jms_serializer.subscribing_handler');
+
+$container->setDefinition(
+    'dlinsmeyer_api.serializer.handler.mixed_type',
+    $mixedTypeDefinition
 );
