@@ -17,6 +17,16 @@ use JMS\Serializer\SerializationContext;
  */
 class MixedTypeHandler implements SubscribingHandlerInterface
 {
+    /**@#+
+     * used for referencing various components of the mixed type serialized array
+     *
+     * @var string
+     * @const
+     */
+    const RESPONSE_DATA_KEY = 'data';
+    const RESPONSE_TYPE_KEY = 'type';
+    /**@#0 */
+
     /**
      * Return format:
      *
@@ -54,12 +64,28 @@ class MixedTypeHandler implements SubscribingHandlerInterface
     /**
      * Given a $value, determines the *actual* type of the data, serializes, and returns
      *
+     * The way this works is by wrapping the value in an array with 'type' as a property on the array, and then serializing as type==array.
+     * On deserialization, we use the type property to determine the actual data structure again to restore the object/value
+     *
+     * The reason this returns a data result wrapped in an array is to allow for easy consumption by
+     * front-end clients that may not be interested in the data type.
+     * result.data.blah is much easier to reference than some of our prior approaches such as result.DATA_TYPE.blah,
+     * where DATA_TYPE is dynamic depending on the data. This approach gives FE consumers a consistent way to access the data
+     * without needing to know the type
+     *
+     * Due to how the serializer functions, we couldn't create a separate object to store this data, as the $data property would have
+     * to be of type==Mixed, and we'd be right back to square one
+     *
      * @param JsonSerializationVisitor $visitor
      * @param $value
      * @param array $type
      * @param SerializationContext $context
      *
-     * @return mixed
+     * @return array - returns an array of the following format:
+     * {
+     *      'type' => (string) the type of the data detected
+     *      'data' => (mixed) data prepared for serialization
+     * }
      */
     public function serializeMixedTypeToJson(JsonSerializationVisitor $visitor, $value, array $type, SerializationContext $context)
     {
@@ -67,43 +93,31 @@ class MixedTypeHandler implements SubscribingHandlerInterface
 
         $dataType = $this->determineType($value);
 
-        $typeArr = array(
-            'name' => $dataType,
+        $arrayTypeArr = array(
+            'name' => 'array',
             'params' => array()
         );
 
-        /**
-         * We need to store the type information along w/ the object on
-         * serialization. To do this, we're taking advantage of
-         * the array<k,T> type, with k being our class/type expressed as a
-         * string, and T being our data
-         */
-        $wrapperArr = array(
-            'name' => 'array',
-            'params' => array(
-                array(
-                    'name' => 'string',
-                    'params' => array(),
-                ),
-                $typeArr
-            )
-        );
         $wrappedData = array(
-            $dataType => $value
+            self::RESPONSE_TYPE_KEY => $dataType,
+            self::RESPONSE_DATA_KEY => $value,
         );
 
         if($isObject){
-            /**
+            /*
              * this has to be done to ensure the serializer will properly parse this value
              * See JMS/Serializer/GraphNavigator.php line 143 (if ($context->isVisiting($data)) [...])
              */
             $context->stopVisiting($value);
-            $result = $visitor->getNavigator()->accept($wrappedData, $wrapperArr, $context);
+            $result = $visitor->getNavigator()->accept($wrappedData, $arrayTypeArr, $context);
             //now that we're done, reattach so it can handle all of its cleanup
             $context->startVisiting($value);
+
             return $result;
         } else {
-            return $visitor->getNavigator()->accept($wrappedData, $wrapperArr, $context);
+            $result = $visitor->getNavigator()->accept($wrappedData, $arrayTypeArr, $context);
+
+            return $result;
         }
     }
 
@@ -111,7 +125,13 @@ class MixedTypeHandler implements SubscribingHandlerInterface
      * Based on the data type stored in the $value array, deserializes data and returns.
      *
      * @param JsonDeserializationVisitor $visitor
-     * @param array $value - an array of the format: [type => data], where type is the data type for the data, and data is...data
+     * @param array $value - an array of the following format:
+     * {
+     *      'type' => (string) the type of the data detected
+     *      'data' => (mixed) data prepared for serialization
+     * }
+     * where type is the data type for the data, and data is the actual data to serialize
+     *
      * @param array $type
      * @param DeserializationContext $context
      *
@@ -120,7 +140,7 @@ class MixedTypeHandler implements SubscribingHandlerInterface
     public function deserializeMixedTypeFromJson(JsonDeserializationVisitor $visitor, array $value, array $type, DeserializationContext $context)
     {
         $declaredType = $this->extractTypeOnDeserialize($value);
-        $extractedData = current($value);
+        $extractedData = $value[self::RESPONSE_DATA_KEY];
         $correctTypeArr = array(
             'name' => $declaredType,
             'params' => array(),
@@ -140,7 +160,7 @@ class MixedTypeHandler implements SubscribingHandlerInterface
      */
     protected function extractTypeOnDeserialize(array $value)
     {
-        return key($value);
+        return $value[self::RESPONSE_TYPE_KEY];
     }
 
     /**
