@@ -191,6 +191,14 @@ class ResponseBuilder implements ResponseBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function hasResponseType($typeKeyStr)
+    {
+        return array_key_exists($typeKeyStr, $this->responseTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildResponse()
     {
         $version = $this->getVersion();
@@ -204,7 +212,7 @@ class ResponseBuilder implements ResponseBuilderInterface
 
         $format = $this->getFormat();
 
-        if (!array_key_exists($format, $this->responseTypes)) {
+        if (!$this->hasResponseType($format)) {
             $responseTypesStr = implode(',', $this->responseTypes);
             throw new InvalidBuilderConfigurationException(
                 sprintf(
