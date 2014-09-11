@@ -139,7 +139,16 @@ interface ResponseBuilderInterface
      * @return self
      */
     public function addResponseType($typeKeyStr, AbstractResponse $responseType);
-    
+
+    /**
+     * Specifies whether or not the builder has the response type specified by $typeKeyStr
+     *
+     * @param string $typeKeyStr
+     *
+     * @return bool
+     */
+    public function hasResponseType($typeKeyStr);
+
     /**
      * Build our response based on configured parameters
      *
@@ -148,4 +157,3 @@ interface ResponseBuilderInterface
      */
     public function buildResponse();
 }
- 
