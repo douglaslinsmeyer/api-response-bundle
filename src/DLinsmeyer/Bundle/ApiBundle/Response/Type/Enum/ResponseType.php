@@ -26,11 +26,11 @@ class ResponseType
      */
     public static function getOptions()
     {
-        return [
+        return array(
             self::XML,
             self::YML,
             self::JSON,
-        ];
+        );
     }
 
     /**
