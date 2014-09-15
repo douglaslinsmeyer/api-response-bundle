@@ -8,7 +8,6 @@
 namespace DLinsmeyer\Bundle\ApiBundle\Response\Builder;
 
 use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationException;
-use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationExceptionInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
