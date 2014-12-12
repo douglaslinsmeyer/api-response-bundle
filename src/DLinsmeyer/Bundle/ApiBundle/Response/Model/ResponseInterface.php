@@ -74,4 +74,11 @@ interface ResponseInterface
      * @return self
      */
     public function setCode($code);
+
+    /**
+     * Returns an array representing our object
+     *
+     * @return array
+     */
+    public function toArray();
 }
