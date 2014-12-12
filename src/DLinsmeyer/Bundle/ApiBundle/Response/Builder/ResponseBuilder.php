@@ -10,8 +10,7 @@ namespace DLinsmeyer\Bundle\ApiBundle\Response\Builder;
 use DLinsmeyer\Bundle\ApiBundle\Exception\InvalidBuilderConfigurationException;
 use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
-use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerInterface;
+use DLinsmeyer\Bundle\ApiBundle\Serializer\SerializerAdapterInterface;
 
 /**
  * Handles constructing a response model
@@ -31,7 +30,7 @@ class ResponseBuilder implements ResponseBuilderInterface
     /**
      * Serializer used for building response
      *
-     * @var SerializerInterface
+     * @var SerializerAdapterInterface
      */
     protected $serializer;
 
@@ -66,11 +65,27 @@ class ResponseBuilder implements ResponseBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct(ResponseInterface $prototype, SerializerInterface $serializer)
+    public function __construct(ResponseInterface $prototype, SerializerAdapterInterface $serializer)
     {
-        $this->responseModel = clone    $prototype;
+        $this->responseModel = clone $prototype;
         $this->serializer = $serializer;
         $this->responseTypes = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseModel()
+    {
+        return $this->responseModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSerializer()
+    {
+        return $this->serializer;
     }
 
     /**
@@ -201,11 +216,6 @@ class ResponseBuilder implements ResponseBuilderInterface
      */
     public function buildResponse()
     {
-        $version = $this->getVersion();
-        if (empty($version)) {
-            throw new InvalidBuilderConfigurationException('No version specified.');
-        }
-
         if (empty($this->responseTypes)) {
             throw new InvalidBuilderConfigurationException('No known response types specified.');
         }
@@ -223,27 +233,9 @@ class ResponseBuilder implements ResponseBuilderInterface
             );
         }
 
-        $groups = $this->getGroups();
+        $serializedData = $this->getSerializer()->serialize($this);
 
-        $serializationContext = SerializationContext::create();
-        $serializationContext
-            ->setVersion($version)
-            ->setSerializeNull(true)
-            ->enableMaxDepthChecks();
-
-        if (null !== $groups) {
-            $serializationContext->setGroups($$groups);
-        }
-
-        $serializedResponseData = $this->serializer->serialize(
-            $this->responseModel,
-            $format,
-            $serializationContext
-        );
-
-        $response = $this->responseTypes[$format]->setContent(
-            $serializedResponseData
-        );
+        $response = $this->responseTypes[$format]->setContent($serializedData);
 
         return $response;
     }

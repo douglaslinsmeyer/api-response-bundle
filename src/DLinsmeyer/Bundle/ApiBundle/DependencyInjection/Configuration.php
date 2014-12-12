@@ -12,6 +12,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    const CONFIGURABLE_SERIALIZER_KEY = 'api_response_serializer';
+
     /**
      * {@inheritDoc}
      */
@@ -23,6 +25,8 @@ class Configuration implements ConfigurationInterface
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
+        $rootNode->children()
+            ->scalarNode(self::CONFIGURABLE_SERIALIZER_KEY)->end();
 
         return $treeBuilder;
     }

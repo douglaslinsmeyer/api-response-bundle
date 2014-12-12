@@ -14,6 +14,8 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class DLinsmeyerApiExtension extends Extension
 {
+    const CONFIGURABLE_SERIALIZER_ALIAS = 'dlinsmeyer_api.api_response_serializer';
+
     /**
      * {@inheritDoc}
      */
@@ -21,6 +23,13 @@ class DLinsmeyerApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+
+        if(isset($config[Configuration::CONFIGURABLE_SERIALIZER_KEY])){
+            $container->setAlias(
+                self::CONFIGURABLE_SERIALIZER_ALIAS,
+                $config[Configuration::CONFIGURABLE_SERIALIZER_KEY]
+            );
+        }
 
         $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.php');

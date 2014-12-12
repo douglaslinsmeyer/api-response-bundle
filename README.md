@@ -72,10 +72,13 @@ Since bundles are merely packages in Silex, we need to do some manual service co
 
 3. Usage
 -------------------------------
+With the introduction of the SerializationAdapterInterface, there are several more ways callers can utilize the response builder. 
+
+
+###JMS Serializer
+If no other configuration is made, JMS serializer will be used by default.
 
 ```php
-
-
 /**
  * @Inject("acme.repository.document")
  *
@@ -123,13 +126,27 @@ public function searchAction($version, $query)
 
     return $response;
 }
-
 ```
+
+###JSON Serializer
+In order to use json_encode serialization, you need to make a config change
+
+```yaml
+d_linsmeyer_api:
+    api_response_serializer: api_response_serializer.json
+```
+
+**Note:** By default, this serializer disregards all context-related data such as version, group, etc.
+Only the response model will be encoded.
+
+Other than that, follow the code sample [in the above](#jms-serializer) for usage.
+
 4. Extension
 -------------------------------
+###Overriding MixedTypeHandler
 A need may arise for you to extend the ```MixedTypeHandler``` class. In such instance, perform the following.
 
-###Create Overriding Class
+####Create Overriding Class
 Create a class which extends the MixedTypeHandler. Such as below:
 ```php
 <?php
@@ -161,7 +178,7 @@ class MixedTypeHandler extends BaseMixedTypeHandler
 }
 ```
 
-###Override service
+####Override service
 In your calling library's services configuration file, perform the following:
 ```yml
 dlinsmeyer_api.serializer.handler.mixed_type:
@@ -169,3 +186,17 @@ dlinsmeyer_api.serializer.handler.mixed_type:
     tags:
         - { name: jms_serializer.subscribing_handler }
 ```
+
+###Creating a custom serializer
+By default, this library comes with JMS and json_encode() serialization by default. To add support for other serializers, perform the following:
+
+1. Create a class that extends the SerializerAdapterInterface
+2. Create a service definition for that class.
+3. In your config, define the following:
+
+    ```yaml
+    d_linsmeyer_api:
+        api_response_serializer: %YOUR_SERIALIZER_SERVICE_REFERENCE%
+    ```
+    
+    

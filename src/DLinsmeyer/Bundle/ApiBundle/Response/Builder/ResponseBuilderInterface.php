@@ -12,7 +12,7 @@ use DLinsmeyer\Bundle\ApiBundle\Response\Model\ResponseInterface;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\AbstractResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\XmlResponse;
 use DLinsmeyer\Bundle\ApiBundle\Response\Type\YmlResponse;
-use JMS\Serializer\SerializerInterface;
+use DLinsmeyer\Bundle\ApiBundle\Serializer\SerializerAdapterInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -31,9 +31,9 @@ interface ResponseBuilderInterface
      * Constructor
      *
      * @param ResponseInterface $prototype the prototype model off of which our response should be based
-     * @param SerializerInterface $serializerInterface - serializer for building our response
+     * @param SerializerAdapterInterface $serializer - serializer for building our response
      */
-    public function __construct(ResponseInterface $prototype, SerializerInterface $serializerInterface);
+    public function __construct(ResponseInterface $prototype, SerializerAdapterInterface $serializer);
 
     /**
      * set success
@@ -155,4 +155,16 @@ interface ResponseBuilderInterface
      * @throws InvalidBuilderConfigurationException thrown if the response is not properly configured
      */
     public function buildResponse();
+
+    /**
+     * Get the response model holding all of our configured properties
+     *
+     * @return ResponseInterface
+     */
+    public function getResponseModel();
+
+    /**
+     * @return SerializerAdapterInterface
+     */
+    public function getSerializer();
 }

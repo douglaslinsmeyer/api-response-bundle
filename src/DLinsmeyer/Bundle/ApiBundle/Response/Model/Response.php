@@ -183,4 +183,17 @@ class Response implements ResponseInterface
     {
         return $this->success;
     }
+
+    /**
+	 * {@inheritdoc}
+	 */
+    public function toArray () {
+        return array(
+            'success' => $this->getSuccess(),
+            'code' => $this->getCode(),
+            'message' => $this->getMessage(),
+            'data' => $this->getData(),
+            'errors' => $this->getErrors(),
+        );
+    }
 }

@@ -3,6 +3,7 @@
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use \DLinsmeyer\Bundle\ApiBundle\Response\Type\Enum\ResponseType;
+use \DLinsmeyer\Bundle\ApiBundle\DependencyInjection\DLinsmeyerApiExtension;
 
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $container->setDefinition(
@@ -31,32 +32,75 @@ $container->setDefinition(
     )
 );
 
+$responseTypeCallable = function(Definition $definition){
+    $definition->addMethodCall(
+        'addResponseType',
+        array(
+            ResponseType::JSON,
+            new Reference('response_type_json'),
+        )
+    )->addMethodCall(
+        'addResponseType',
+        array(
+            ResponseType::XML,
+            new Reference('response_type_xml'),
+        )
+    )->addMethodCall(
+        'addResponseType',
+        array(
+            ResponseType::YML,
+            new Reference('response_type_yml'),
+        )
+    );
+};
+
+/*
+ * configure the two provided serializers
+ */
+//JMS
+$jmsSerializerAdapterDef = new Definition(
+    'DLinsmeyer\Bundle\ApiBundle\Serializer\Adapter\JmsSerializerAdapter',
+    array(
+        new Reference('serializer')
+    )
+);
+$container->setDefinition(
+    'api_response_serializer.jms',
+    $jmsSerializerAdapterDef
+);
+
+//JSON
+$jsonSerializerAdapterDef = new Definition(
+    'DLinsmeyer\Bundle\ApiBundle\Serializer\Adapter\JsonEncodeAdapter'
+);
+$container->setDefinition(
+    'api_response_serializer.json',
+    $jsonSerializerAdapterDef
+);
+
+/**
+ * If no serializer is defined, use JMS
+ */
+if(!$container->hasAlias(DLinsmeyerApiExtension::CONFIGURABLE_SERIALIZER_ALIAS)){
+    $container->setAlias(
+        DLinsmeyerApiExtension::CONFIGURABLE_SERIALIZER_ALIAS,
+        'api_response_serializer.jms'
+    );
+}
+
 $responseBuilderDef = new Definition(
     'DLinsmeyer\Bundle\ApiBundle\Response\Builder\ResponseBuilder',
     array(
         new Reference('dlinsmeyer_api.response'),
-        new Reference('serializer'),
+        new Reference(DLinsmeyerApiExtension::CONFIGURABLE_SERIALIZER_ALIAS),
     )
 );
-$responseBuilderDef->addMethodCall(
-    'addResponseType',
-    array(
-        ResponseType::JSON,
-        new Reference('response_type_json'),
-    )
-)->addMethodCall(
-    'addResponseType',
-    array(
-        ResponseType::XML,
-        new Reference('response_type_xml'),
-    )
-)->addMethodCall(
-    'addResponseType',
-    array(
-        ResponseType::YML,
-        new Reference('response_type_yml'),
-    )
-);
+
+/*
+ * Add our response types to our builder(s)
+ */
+$responseTypeCallable($responseBuilderDef);
+
 $container->setDefinition(
     'dlinsmeyer_api.response_builder',
     $responseBuilderDef
